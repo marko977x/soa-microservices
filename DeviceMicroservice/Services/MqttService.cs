@@ -46,7 +46,6 @@ namespace DeviceMicroservice.Services
                 MqttApplicationMessage message = new MqttApplicationMessageBuilder()
                     .WithTopic(topic)
                     .WithPayload(JsonConvert.SerializeObject(data))
-                    .WithExactlyOnceQoS()
                     .WithRetainFlag()
                     .Build();
 
@@ -58,11 +57,29 @@ namespace DeviceMicroservice.Services
             }
         }
 
-        public async Task Subscribe(string topic)
+        public async Task Publish(object data)
+        {
+            try
+            {
+                MqttApplicationMessage message = new MqttApplicationMessageBuilder()
+                    .WithPayload(JsonConvert.SerializeObject(data))
+                    .WithRetainFlag()
+                    .Build();
+
+                await _client.PublishAsync(message, CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Publish failed: " + e.Message);
+            }
+        }
+
+        public async Task Subscribe(string topic, Action<MqttApplicationMessageReceivedEventArgs> callback)
         {
             try
             {
                 await _client.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic).Build());
+                _client.UseApplicationMessageReceivedHandler(callback);
             }
             catch (Exception e)
             {

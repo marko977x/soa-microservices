@@ -2,6 +2,7 @@
 using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using Newtonsoft.Json;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,24 +20,71 @@ namespace DataMicroservice.Services
 
         public async Task Connect()
         {
-            await _client.ConnectAsync((new MqttClientOptionsBuilder()).WithWebSocketServer(PUBLIC_MQTT_SERVER_SOCKET).Build(), CancellationToken.None);
+            try
+            {
+                await _client.ConnectAsync(
+                    new MqttClientOptionsBuilder()
+                        .WithWebSocketServer(PUBLIC_MQTT_SERVER_SOCKET)
+                        .Build(),
+                    CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Connect failed: " + e.Message);
+            }
+        }
+
+        public bool IsConnected()
+        {
+            return _client.IsConnected;
         }
 
         public async Task Publish(object data, string topic)
         {
-            MqttApplicationMessage message = new MqttApplicationMessageBuilder()
-                .WithTopic(topic)
-                .WithPayload(JsonConvert.SerializeObject(data))
-                .WithExactlyOnceQoS()
-                .WithRetainFlag()
-                .Build();
+            try
+            {
+                MqttApplicationMessage message = new MqttApplicationMessageBuilder()
+                    .WithTopic(topic)
+                    .WithPayload(JsonConvert.SerializeObject(data))
+                    .WithRetainFlag()
+                    .Build();
 
-            await _client.PublishAsync(message, CancellationToken.None);
+                await _client.PublishAsync(message, CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Publish failed: " + e.Message);
+            }
         }
 
-        public async Task Subscribe(string topic)
+        public async Task Publish(object data)
         {
-            await _client.SubscribeAsync(topic);
+            try
+            {
+                MqttApplicationMessage message = new MqttApplicationMessageBuilder()
+                    .WithPayload(JsonConvert.SerializeObject(data))
+                    .WithRetainFlag()
+                    .Build();
+
+                await _client.PublishAsync(message, CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Publish failed: " + e.Message);
+            }
+        }
+
+        public async Task Subscribe(string topic, Action<MqttApplicationMessageReceivedEventArgs> callback)
+        {
+            try
+            {
+                await _client.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic).Build());
+                _client.UseApplicationMessageReceivedHandler(callback);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Subscribe failed: " + e.Message);
+            }
         }
     }
 }
