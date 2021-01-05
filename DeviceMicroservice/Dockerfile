@@ -4,22 +4,21 @@
 #For more information, please see https://aka.ms/containercompat
 
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+EXPOSE 4000
+WORKDIR /device-microservice
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-WORKDIR /src
-COPY ["DeviceMicroservice/DeviceMicroservice.csproj", "DeviceMicroservice/"]
-RUN dotnet restore "DeviceMicroservice/DeviceMicroservice.csproj"
+
+WORKDIR /device-microservice/src
 COPY . .
-WORKDIR "/src/DeviceMicroservice"
-RUN dotnet build "DeviceMicroservice.csproj" -c Release -o /app/build
+RUN dotnet restore "DeviceMicroservice.csproj"
+RUN dotnet build "DeviceMicroservice.csproj" -c Release -o /device-microservice/build
+ENTRYPOINT ["dotnet", "DataMicroservice.dll"]
 
 FROM build AS publish
-RUN dotnet publish "DeviceMicroservice.csproj" -c Release -o /app/publish
+RUN dotnet publish "DeviceMicroservice.csproj" -c Release -o /device-microservice/publish
 
 FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+WORKDIR /device-microservice
+COPY --from=publish /device-microservice/publish .
 ENTRYPOINT ["dotnet", "DeviceMicroservice.dll"]
