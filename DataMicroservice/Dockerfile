@@ -4,22 +4,21 @@
 #For more information, please see https://aka.ms/containercompat
 
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+EXPOSE 5000
+WORKDIR /data-microservice
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-WORKDIR /src
-COPY ["DataMicroservice/DataMicroservice.csproj", "DataMicroservice/"]
-RUN dotnet restore "DataMicroservice/DataMicroservice.csproj"
+
+WORKDIR /data-microservice/src
 COPY . .
-WORKDIR "/src/DataMicroservice"
-RUN dotnet build "DataMicroservice.csproj" -c Release -o /app/build
+RUN dotnet restore "DataMicroservice.csproj"
+RUN dotnet build "DataMicroservice.csproj" -c Release -o /data-microservice/build
+ENTRYPOINT ["dotnet", "DataMicroservice.dll"]
 
 FROM build AS publish
-RUN dotnet publish "DataMicroservice.csproj" -c Release -o /app/publish
+RUN dotnet publish "DataMicroservice.csproj" -c Release -o /data-microservice/publish
 
 FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+WORKDIR /data-microservice
+COPY --from=publish /data-microservice/publish .
 ENTRYPOINT ["dotnet", "DataMicroservice.dll"]

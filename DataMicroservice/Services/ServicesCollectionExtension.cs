@@ -7,7 +7,9 @@ namespace DataMicroservice.Services
         public static void AddServices(this IServiceCollection services)
         {
             services.AddSingleton(new MqttService());
-            services.AddSingleton(serviceProvider => new DataService(serviceProvider.GetService<MqttService>()));
+            services.AddSingleton<IInfluxDBService, InfluxDBService>();
+            services.AddSingleton<DataService>();
+            services.AddTransient<IInfluxDBService, InfluxDBService>();
         }
     }
 }
