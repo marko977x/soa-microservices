@@ -1,5 +1,8 @@
+using AnalyticsMicroservice.Models;
 using MQTTnet;
+using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 
@@ -7,10 +10,11 @@ namespace AnalyticsMicroservice.Services
 {
     public class AnalyticsService
     {
-        public static readonly string[] EVENTS = { "EVENT1", "EVENT2", "EVENT3" };
+        public static readonly string[] Events = { "EVENT1", "EVENT2", "EVENT3" };
         private MqttService _mqttService;
         private IInfluxDBService _database;
         private event EventHandler ServiceCreated;
+        private WeatherData _model;
         public AnalyticsService(MqttService mqttService, IInfluxDBService database)
         {
             _mqttService = mqttService;
@@ -32,16 +36,25 @@ namespace AnalyticsMicroservice.Services
 
         private void OnDataReceived(MqttApplicationMessageReceivedEventArgs arg)
         {
-            Console.WriteLine(Encoding.UTF8.GetString(arg.ApplicationMessage.Payload));
-            if (AnalyzeData(Encoding.UTF8.GetString(arg.ApplicationMessage.Payload)) != "")
+            SensorData data = JsonConvert.DeserializeObject<SensorData>(
+                Encoding.UTF8.GetString(arg.ApplicationMessage.Payload));
+
+            _model[data.SensorType] = data.Value;
+
+            if (!_model.Check()) return;
+
+            if (Events.Contains(GetEventBasedOnModel()))
             {
                 //_database.Write(Encoding.UTF8.GetString(arg.ApplicationMessage.Payload));
                 //SendActionRequestToCommandMicroservice("Command");
             }
+
+            _model.Clear();
         }
 
-        private string AnalyzeData(String data)
+        private string GetEventBasedOnModel()
         {
+            // analyze this._model
             return "";
         }
 
