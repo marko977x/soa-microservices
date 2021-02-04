@@ -6,7 +6,8 @@
     <StartupObject>DeviceMicroservice.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MQTTnet" Version="3.0.13"/>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3"/>
+    <PackageReference Include="CsvHelper" Version="21.0.3" />
+    <PackageReference Include="MQTTnet" Version="3.0.13" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 </Project>
