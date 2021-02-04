@@ -29,10 +29,11 @@ namespace DataMicroservice.Services
             await _mqttService.Subscribe("sensor/data", OnDataReceived);
         }
 
-        private void OnDataReceived(MqttApplicationMessageReceivedEventArgs arg)
+        private async void OnDataReceived(MqttApplicationMessageReceivedEventArgs arg)
         {
             Console.WriteLine(Encoding.UTF8.GetString(arg.ApplicationMessage.Payload));
             _database.Write("mem,host=host1 used_percent=23.43234543");
+            await _mqttService.Publish(Encoding.UTF8.GetString(arg.ApplicationMessage.Payload), "data-analytics/data");
         }
     }
 }
