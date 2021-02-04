@@ -1,4 +1,8 @@
-﻿using MQTTnet;
+﻿using DataMicroservice.DataModels;
+using InfluxDB.Client.Api.Domain;
+using InfluxDB.Client.Writes;
+using MQTTnet;
+using Newtonsoft.Json;
 using System;
 using System.Text;
 
@@ -31,8 +35,21 @@ namespace DataMicroservice.Services
 
         private void OnDataReceived(MqttApplicationMessageReceivedEventArgs arg)
         {
-            Console.WriteLine(Encoding.UTF8.GetString(arg.ApplicationMessage.Payload));
-            _database.Write("mem,host=host1 used_percent=23.43234543");
+            var json_data = Encoding.UTF8.GetString(arg.ApplicationMessage.Payload);
+            //Console.WriteLine(json_data);
+            SensorData sensorData = JsonConvert.DeserializeObject<SensorData>(json_data);
+            this.saveData(sensorData);
+        }
+
+        public void saveData(SensorData sensorData)
+        {
+            var point = PointData
+                      .Measurement("SensorsData")
+                      .Tag("sensor", sensorData.SensorType)
+                      .Field("value", sensorData.Value)
+                      .Timestamp(DateTime.UtcNow, WritePrecision.Ms);
+            _database.Write(point);
+            //Console.WriteLine("added to db");
         }
     }
 }

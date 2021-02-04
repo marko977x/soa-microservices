@@ -7,7 +7,7 @@ namespace DeviceMicroservice.Services
         public static void AddServices(this IServiceCollection services)
         {
             services.AddSingleton(new MqttService());
-            services.AddSingleton(serviceProvider => new SensorService(serviceProvider.GetService<MqttService>()));
+            services.AddSingleton(serviceProvider => new SensorsListService(serviceProvider.GetService<MqttService>()));
         }
     }
 }
