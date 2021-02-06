@@ -45,7 +45,7 @@ namespace DataMicroservice.Services
         {
             var point = PointData
                       .Measurement("SensorsData")
-                      .Tag("sensor", sensorData.SensorType)
+                      .Tag("sensor", sensorData.SensorType.ToLower())
                       .Field("value", sensorData.Value)
                       .Timestamp(DateTime.UtcNow, WritePrecision.Ms);
             _database.Write(point);

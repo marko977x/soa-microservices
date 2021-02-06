@@ -14,7 +14,7 @@ namespace DeviceMicroservice.Services
         public const float INITIAL_SENSOR_THRESHOLD = 1000;
         public float Threshold { get; set; }
         public double Timeout { get; set; }
-        public bool IsTreshold { get; set; }
+        public bool IsThreshold { get; set; }
         public bool IsMeasuring { get; set; }
         public double Value { get; set; }
         public string SensorType { get; set; }
@@ -38,6 +38,7 @@ namespace DeviceMicroservice.Services
             _timer.Start();
             this.IsMeasuring = true;
             this.setCsv();
+            this.IsThreshold = false;
         }
 
         private void setCsv()
@@ -60,10 +61,16 @@ namespace DeviceMicroservice.Services
             {
                 this.ReadValue();
                 SensorData data = new SensorData(this.Value, this.SensorType);
-                if (!this.IsTreshold)
+                if (!this.IsThreshold)
+                {
                     await _mqttService.Publish(data, "sensor/data");
+                    Console.WriteLine(data.Value);
+                }
                 else if (data.Value > this.Threshold)
+                {
                     await _mqttService.Publish(data, "sensor/data");
+                    Console.WriteLine(data.Value);
+                }
             }
         }
 
@@ -88,7 +95,7 @@ namespace DeviceMicroservice.Services
         }
         private async Task SendValueAsync()
         {
-            if (IsTreshold)
+            if (IsThreshold)
             {
                 if (Value > Threshold)
                 {
@@ -118,7 +125,6 @@ namespace DeviceMicroservice.Services
                     sensor_value = _csv.GetField<string>(this.SensorType);
                 }
                 this.Value = double.Parse(sensor_value, CultureInfo.InvariantCulture);
-                Console.WriteLine(this.Value);
             }
             catch (IOException e)
             {

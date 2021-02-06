@@ -9,7 +9,7 @@ namespace DataMicroservice.Services
     public class InfluxDBService : IInfluxDBService
     {
         public const string DB_CONNECTION_URL = "http://localhost:8086";
-        public const string DB_TOKEN = "ehq5KHgbIiTkeENZm-CAHzXcheTh34kU02Qzb7PIRTCQsDjglwpDxED-XSsir9gc-JfIDOd_KHUEQV6h0KAKSg==";
+        public const string DB_TOKEN = "q0eg5AjlaL_qwsFE1Gobdcf0JLH11v364rpwJAPIhuLoY2csNdIUx5wiPp6Wq5M4EXGtOfybRAu2Np34j8xk-g==";
         public const string DB_BUCKET = "soa";
         public const string DB_ORGANIZATION = "soa";
 
