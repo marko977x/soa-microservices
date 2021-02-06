@@ -62,15 +62,9 @@ namespace DeviceMicroservice.Services
                 this.ReadValue();
                 SensorData data = new SensorData(this.Value, this.SensorType);
                 if (!this.IsThreshold)
-                {
                     await _mqttService.Publish(data, "sensor/data");
-                    Console.WriteLine(data.Value);
-                }
                 else if (data.Value > this.Threshold)
-                {
                     await _mqttService.Publish(data, "sensor/data");
-                    Console.WriteLine(data.Value);
-                }
             }
         }
 

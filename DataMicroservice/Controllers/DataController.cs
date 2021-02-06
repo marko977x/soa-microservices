@@ -30,7 +30,7 @@ namespace DataMicroservice.Controllers
         {
 
             string query = $"from(bucket: \"soa\") " +
-                $"|> range(start: -5m) " +
+                $"|> range(start: -2m) " +
                 $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
                 $"|> filter(fn: (r) => r._field == \"value\") " +
                 $"|> filter(fn: (r) => r.sensor == \"{sensorType.ToLower()}\")" +
@@ -45,7 +45,7 @@ namespace DataMicroservice.Controllers
         {
 
             string query = $"from(bucket: \"soa\") " +
-                $"|> range(start: -5m) " +
+                $"|> range(start: -2m) " +
                 $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
                 $"|> filter(fn: (r) => r._field == \"value\") " +
                 $"|> last()";

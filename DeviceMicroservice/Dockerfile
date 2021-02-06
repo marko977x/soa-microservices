@@ -13,7 +13,7 @@ WORKDIR /device-microservice/src
 COPY . .
 RUN dotnet restore "DeviceMicroservice.csproj"
 RUN dotnet build "DeviceMicroservice.csproj" -c Release -o /device-microservice/build
-ENTRYPOINT ["dotnet", "DataMicroservice.dll"]
+ENTRYPOINT ["dotnet", "DeviceMicroservice.dll"]
 
 FROM build AS publish
 RUN dotnet publish "DeviceMicroservice.csproj" -c Release -o /device-microservice/publish
