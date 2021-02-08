@@ -56,6 +56,10 @@ namespace DataMicroservice.Controllers
                 fluxTable.Records.ForEach(fluxRecord =>
                 {
                     fluxRecords.Add(fluxRecord);
+                    //foreach (KeyValuePair<string, object> kvp in fluxRecord.Values)
+                    //{
+                    //    Console.WriteLine($"key: {kvp.Key}, val: {kvp.Value}");
+                    //}
                 });
             });
             return Ok(fluxRecords);

@@ -1,4 +1,6 @@
 using AnalyticsMicroservice.Models;
+using InfluxDB.Client.Api.Domain;
+using InfluxDB.Client.Writes;
 using MQTTnet;
 using Newtonsoft.Json;
 using System;
@@ -10,7 +12,9 @@ namespace AnalyticsMicroservice.Services
 {
     public class AnalyticsService
     {
-        public static readonly string[] Events = { "EVENT1", "EVENT2", "EVENT3" };
+        public static readonly string[] Events = { "Vedro, pogodno za izlazak", "Vedro, nepogodno za hronicne bolesnike",
+            "Vedro, ne preporucuje se izlazak napolje", "Sneg", "Kisa", "Oblacno", "Magla", "Relativno oblacno", "Temperature senzor pokvaren",
+            "Humidity senzor pokvaren", "Pressure senzor pokvaren"};
         private MqttService _mqttService;
         private IInfluxDBService _database;
         private event EventHandler ServiceCreated;
@@ -42,20 +46,24 @@ namespace AnalyticsMicroservice.Services
             _model[data.SensorType] = data.Value;
 
             if (!_model.Check()) return;
-
-            if (Events.Contains(GetEventBasedOnModel()))
+            string eventVal = GetEventBasedOnModel();
+            if (Events.Contains(eventVal))
             {
-                //_database.Write(Encoding.UTF8.GetString(arg.ApplicationMessage.Payload));
-                //SendActionRequestToCommandMicroservice("Command");
+                var point = PointData
+                      .Measurement("AnalyticsData")
+                      .Field("event", eventVal)
+                      .Timestamp(DateTime.UtcNow, WritePrecision.Ms);
+                _database.Write(point);
+                SendActionRequestToCommandMicroservice(eventVal);
+                SendEventToWebDashboard(eventVal);
             }
-
             _model.Clear();
         }
 
         private string GetEventBasedOnModel()
         {
             // analyze this._model
-            return "";
+            return _model.Analyze();
         }
 
         private async void SendActionRequestToCommandMicroservice(string command)
@@ -69,6 +77,11 @@ namespace AnalyticsMicroservice.Services
             {
                 Console.WriteLine(exception.Message);
             }
+        }
+
+        private async void SendEventToWebDashboard(string eventVal)
+        {
+
         }
     }
 }
