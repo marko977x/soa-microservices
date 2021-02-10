@@ -23,41 +23,59 @@ namespace AnalyticsMicroservice.Services
         {
             _mqttService = mqttService;
             _database = database;
-
+            _model = new WeatherData();
             ServiceCreated += OnServiceCreated;
             ServiceCreated?.Invoke(this, EventArgs.Empty);
         }
 
         private async void OnServiceCreated(object sender, EventArgs args)
         {
-            if (!_mqttService.IsConnected())
+            try
             {
-                await _mqttService.Connect();
-            }
+                if (!_mqttService.IsConnected())
+                {
+                    await _mqttService.Connect();
+                }
 
-            await _mqttService.Subscribe("data-analytics/data", OnDataReceived);
+                await _mqttService.Subscribe("data-analytics/data", OnDataReceived);
+                Console.WriteLine("subscribed");
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         private void OnDataReceived(MqttApplicationMessageReceivedEventArgs arg)
         {
-            SensorData data = JsonConvert.DeserializeObject<SensorData>(
-                Encoding.UTF8.GetString(arg.ApplicationMessage.Payload));
-
-            _model[data.SensorType] = data.Value;
-
-            if (!_model.Check()) return;
-            string eventVal = GetEventBasedOnModel();
-            if (Events.Contains(eventVal))
+            try
             {
-                var point = PointData
-                      .Measurement("AnalyticsData")
-                      .Field("event", eventVal)
-                      .Timestamp(DateTime.UtcNow, WritePrecision.Ms);
-                _database.Write(point);
-                SendActionRequestToCommandMicroservice(eventVal);
-                SendEventToWebDashboard(eventVal);
+                SensorData data = JsonConvert.DeserializeObject<SensorData>(
+                    Encoding.UTF8.GetString(arg.ApplicationMessage.Payload));
+
+                Console.WriteLine($"type: {data.SensorType}, val: {data.Value}");
+
+                _model[data.SensorType] = data.Value;
+
+                if (!_model.Check()) return;
+                string eventVal = GetEventBasedOnModel();
+                Console.WriteLine($"val: {eventVal}");
+                if (Events.Contains(eventVal))
+                {
+                    var point = PointData
+                          .Measurement("AnalyticsData")
+                          .Field("event", eventVal)
+                          .Timestamp(DateTime.UtcNow, WritePrecision.Ms);
+                    _database.Write(point);
+                    SendActionRequestToCommandMicroservice(eventVal);
+                    SendEventToWebDashboard(eventVal);
+                }
+                _model.Clear();
             }
-            _model.Clear();
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         private string GetEventBasedOnModel()
@@ -71,7 +89,9 @@ namespace AnalyticsMicroservice.Services
             HttpClient httpClient = new HttpClient();
             try
             {
-                await httpClient.PostAsync("", new StringContent(command));
+                var responseMessage = await httpClient.PostAsync("http://localhost:5004/api/Command/PostCommand", 
+                    new StringContent("\""+command+"\"", Encoding.UTF8, "application/json"));
+                Console.WriteLine($"post response: {responseMessage}");
             }
             catch (Exception exception)
             {

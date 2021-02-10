@@ -87,22 +87,6 @@ namespace DeviceMicroservice.Services
             IsMeasuring = true;
             _timer.Start();
         }
-        private async Task SendValueAsync()
-        {
-            if (IsThreshold)
-            {
-                if (Value > Threshold)
-                {
-
-                }
-
-            }
-            else
-            {
-
-            }
-        }
-
         private void ReadValue()
         {
             try

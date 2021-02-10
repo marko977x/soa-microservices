@@ -15,6 +15,19 @@ namespace DeviceMicroservice.Controllers
             _sensorsListService = sensorService;
         }
 
+        [HttpGet]
+        public IActionResult GetCommandList()
+        {
+            string commandsList = $"GetSensorParams: type" +
+                $"GetAllSensorsParams: no params" +
+                $"GetTimeout: type" +
+                $"GetThreshold: type" +
+                $"TurnOnOffSensor: on; type" +
+                $"SetTimeout: type; (timeout) value" +
+                $"SetThreshold: type; (threshold) value";
+            return Ok(commandsList);
+        }
+
         [HttpGet("{type}")]
         public IActionResult GetSensorParams([Required, FromRoute] string type)
         {

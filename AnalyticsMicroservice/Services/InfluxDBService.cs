@@ -9,7 +9,7 @@ namespace AnalyticsMicroservice.Services
     public class InfluxDBService : IInfluxDBService
     {
         public const string DB_CONNECTION_URL = "http://localhost:8086";
-        public const string DB_TOKEN = "ntgKPOryZCNj1zlcmt2nuM3mdlJ9U-RH0Il85Iphoq82ljlHjpNCluVPG_L1cQmBrP_5cFEKTTiSmKRlcYBS5A==";
+        public const string DB_TOKEN = "q0eg5AjlaL_qwsFE1Gobdcf0JLH11v364rpwJAPIhuLoY2csNdIUx5wiPp6Wq5M4EXGtOfybRAu2Np34j8xk-g==";
         public const string DB_BUCKET = "soa";
         public const string DB_ORGANIZATION = "soa";
 

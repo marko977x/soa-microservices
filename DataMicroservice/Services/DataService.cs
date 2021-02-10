@@ -35,11 +35,19 @@ namespace DataMicroservice.Services
 
         private async void OnDataReceived(MqttApplicationMessageReceivedEventArgs arg)
         {
-            var json_data = Encoding.UTF8.GetString(arg.ApplicationMessage.Payload);
-            //Console.WriteLine(json_data);
-            SensorData sensorData = JsonConvert.DeserializeObject<SensorData>(json_data);
-            this.saveData(sensorData);
-            await _mqttService.Publish(Encoding.UTF8.GetString(arg.ApplicationMessage.Payload), "data-analytics/data");
+            try
+            {
+                var json_data = Encoding.UTF8.GetString(arg.ApplicationMessage.Payload);
+                Console.WriteLine(json_data);
+                SensorData sensorData = JsonConvert.DeserializeObject<SensorData>(json_data);
+                this.saveData(sensorData);
+                if(_mqttService.IsConnected())
+                    await _mqttService.Publish(sensorData, "data-analytics/data");
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         public void saveData(SensorData sensorData)

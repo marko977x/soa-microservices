@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using AnalyticsMicroservice.Services;
 
@@ -6,9 +7,9 @@ namespace AnalyticsMicroservice.Models
 {
     public class WeatherData
     {
-        public double Temperature { get; set; }
-        public double Humidity { get; set; }
-        public double Pressure { get; set; }
+        public double? Temperature { get; set; }
+        public double? Humidity { get; set; }
+        public double? Pressure { get; set; }
 
         public WeatherData()
         {
@@ -33,16 +34,16 @@ namespace AnalyticsMicroservice.Models
 
         private double UncomfortIndex()
         {
-            double humidity = Humidity;
-            double temperature = Temperature;
+            double humidity = (double)Humidity;
+            double temperature = (double)Temperature;
             return (temperature - 0.55 * (1 - humidity * (temperature - 14.5)));
         }
 
         public string Analyze()
         {
             string result = null;
-            const double rainPressure = 1000.0;
-            const double sunnyPressure = 1020;
+            const double rainPressure = 1005.0;
+            const double sunnyPressure = 1015;
             const double rainHumidity = 0.9;
             const double snowTemperatureHigh = 2.0;
             const double snowTemperatureLow = -2.0;
@@ -52,11 +53,12 @@ namespace AnalyticsMicroservice.Models
             const double pressureBrokenHigh = 1100.0;
             const double pressureBrokenLow = 800.0;
 
-            double pressure = Pressure;
-            double humidity = Humidity;
-            double temperature = Temperature;
+            double pressure = (double)Pressure;
+            double humidity = (double)Humidity;
+            double temperature = (double)Temperature;
             double uncomfortIndex = UncomfortIndex();
             string[] analyticsEvents = AnalyticsService.Events;
+            //Console.WriteLine($"Uncomfort index: {uncomfortIndex}");
             if (pressure > sunnyPressure)
             {
                 if (uncomfortIndex <= 21)
