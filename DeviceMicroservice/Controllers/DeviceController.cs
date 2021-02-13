@@ -18,13 +18,13 @@ namespace DeviceMicroservice.Controllers
         [HttpGet]
         public IActionResult GetCommandList()
         {
-            string commandsList = $"GetSensorParams: type" +
-                $"GetAllSensorsParams: no params" +
-                $"GetTimeout: type" +
-                $"GetThreshold: type" +
-                $"TurnOnOffSensor: on; type" +
-                $"SetTimeout: type; (timeout) value" +
-                $"SetThreshold: type; (threshold) value";
+            string commandsList = $"GetSensorParams: type\n" +
+                $"GetAllSensorsParams: no params\n" +
+                $"GetTimeout: type\n" +
+                $"GetThreshold: type\n" +
+                $"TurnOnOffSensor: (is)on; type\n" +
+                $"SetTimeout: type; (timeout) value\n" +
+                $"SetThreshold: type; (threshold) value\n";
             return Ok(commandsList);
         }
 
@@ -137,7 +137,7 @@ namespace DeviceMicroservice.Controllers
 
         [HttpPost("{type}")]
         public IActionResult SetTimeout(
-            [Required, FromRoute] string type, [FromBody]double? value)
+            [Required, FromRoute] string type, [Required, FromBody] double? value)
 
         {
             foreach (var sensor in this._sensorsListService.SensorsList)
@@ -161,7 +161,7 @@ namespace DeviceMicroservice.Controllers
 
         [HttpPost("{type}")]
         public IActionResult SetThreshold(
-            [Required, FromRoute] string type, [FromBody] double? value)
+            [Required, FromRoute] string type, [Required, FromBody] double? value)
         {
             if (value == null) return BadRequest("Provide treshold value");
 

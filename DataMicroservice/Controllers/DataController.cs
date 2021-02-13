@@ -1,8 +1,6 @@
-﻿using DataMicroservice.DataModels;
-using DataMicroservice.Services;
+﻿using DataMicroservice.Services;
 using InfluxDB.Client.Core.Flux.Domain;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -134,7 +132,7 @@ namespace DataMicroservice.Controllers
         }
 
         [HttpGet("{sensorType}")]
-        async public Task<IActionResult> GetLastNHoursMeanValue([Required, FromRoute] string sensorType, [Required, FromQuery(Name ="hours")] int hours)
+        async public Task<IActionResult> GetLastNHoursMeanValue([Required, FromRoute] string sensorType, [Required, FromQuery(Name = "hours")] int hours)
         {
             string query = $"from(bucket: \"soa\") " +
                 $"|> range(start: -{hours}h) " +
@@ -168,7 +166,7 @@ namespace DataMicroservice.Controllers
         }
 
         [HttpGet("{sensorType}")]
-        async public Task<IActionResult> GetLastNMinutesValues([Required, FromRoute]string sensorType, [Required, FromQuery(Name = "minutes")] int minutes)
+        async public Task<IActionResult> GetLastNMinutesValues([Required, FromRoute] string sensorType, [Required, FromQuery(Name = "minutes")] int minutes)
         {
             string query = $"from(bucket: \"soa\") " +
                 $"|> range(start: -{minutes}m) " +
@@ -188,7 +186,7 @@ namespace DataMicroservice.Controllers
         }
 
         [HttpGet]
-        async public Task<IActionResult> GetAllSensorsLastNMinutesValues([Required, FromQuery(Name ="minutes")] int minutes)
+        async public Task<IActionResult> GetAllSensorsLastNMinutesValues([Required, FromQuery(Name = "minutes")] int minutes)
         {
             string query = $"from(bucket: \"soa\") " +
                 $"|> range(start: -{minutes}m) " +
@@ -203,23 +201,5 @@ namespace DataMicroservice.Controllers
             return Ok(fluxRecords);
         }
 
-        // POST api/<DataController>
-        [HttpPost]
-        public void Post([FromBody, Required] SensorData data)
-        {
-            this._dataService.saveData(data);
-        }
-
-        // PUT api/<DataController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<DataController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }
