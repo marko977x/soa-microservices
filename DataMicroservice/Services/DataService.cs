@@ -25,12 +25,15 @@ namespace DataMicroservice.Services
 
         private async void OnServiceCreated(object sender, EventArgs args)
         {
-            if (!_mqttService.IsConnected())
+            while(!_mqttService.IsConnected())
             {
                 await _mqttService.Connect();
             }
-
-            await _mqttService.Subscribe("sensor/data", OnDataReceived);
+            if(_mqttService.IsConnected())
+                {
+                    await _mqttService.Subscribe("sensor/data", OnDataReceived);
+                    Console.WriteLine("Subscribed");
+                }
         }
 
         private async void OnDataReceived(MqttApplicationMessageReceivedEventArgs arg)
@@ -40,9 +43,9 @@ namespace DataMicroservice.Services
                 var json_data = Encoding.UTF8.GetString(arg.ApplicationMessage.Payload);
                 Console.WriteLine(json_data);
                 SensorData sensorData = JsonConvert.DeserializeObject<SensorData>(json_data);
-                this.saveData(sensorData);
                 if(_mqttService.IsConnected())
                     await _mqttService.Publish(sensorData, "data-analytics/data");
+                this.saveData(sensorData);
             }
             catch(Exception e)
             {

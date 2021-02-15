@@ -1,4 +1,4 @@
-using AnalyticsMicroservice.Models;
+﻿using AnalyticsMicroservice.Models;
 using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Writes;
 using MQTTnet;
@@ -32,15 +32,17 @@ namespace AnalyticsMicroservice.Services
         {
             try
             {
-                if (!_mqttService.IsConnected())
+                while(!_mqttService.IsConnected())
                 {
                     await _mqttService.Connect();
                 }
-
-                await _mqttService.Subscribe("data-analytics/data", OnDataReceived);
-                Console.WriteLine("subscribed");
+                if(_mqttService.IsConnected())
+                {
+                    await _mqttService.Subscribe("data-analytics/data", OnDataReceived);
+                    Console.WriteLine("subscribed");
+                }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
@@ -72,7 +74,7 @@ namespace AnalyticsMicroservice.Services
                 }
                 _model.Clear();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
@@ -89,8 +91,8 @@ namespace AnalyticsMicroservice.Services
             HttpClient httpClient = new HttpClient();
             try
             {
-                var responseMessage = await httpClient.PostAsync("http://localhost:5004/api/Command/PostCommand", 
-                    new StringContent("\""+command+"\"", Encoding.UTF8, "application/json"));
+                var responseMessage = await httpClient.PostAsync("http://commandService/api/Command/PostCommand",
+                    new StringContent("\"" + command + "\"", Encoding.UTF8, "application/json"));
                 Console.WriteLine($"post response: {responseMessage}");
             }
             catch (Exception exception)

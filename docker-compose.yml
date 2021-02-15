@@ -1,0 +1,82 @@
+version: '3'
+services:
+  hivemq:
+    image: hivemq/hivemq4
+    ports:
+     - "8080:8080"
+     - "1883:1883"
+  influxdbData:
+    image: quay.io/influxdb/influxdb:v2.0.4
+    environment: 
+      - INFLUXDB_ADMIN_USER_PASSWORD=adminadmin
+      - INFLUXDB_USER_BUCKET=soa
+      - INFLUXDB_USER_ORGANIZATION=soa
+    volumes:
+        - influxdbvData:/.influxdbvData
+    ports:
+      - "8086:8086"
+    depends_on:
+      - hivemq
+  influxdbAnalytics:
+    image: quay.io/influxdb/influxdb:v2.0.4
+    environment: 
+      - INFLUXDB_ADMIN_USER_PASSWORD=adminadmin
+      - INFLUXDB_USER_BUCKET=soa
+      - INFLUXDB_USER_ORGANIZATION=soa
+    volumes:
+      - influxdbvAnalytics:/.influxdbvAnalitycs
+    ports:
+      - "8087:8086"
+    depends_on:
+      - hivemq
+  device:
+    image: device
+    build:
+        context: ./DeviceMicroservice
+        dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    volumes:
+      - E:\Skola\IVGodina\PoslednjiSemestar\SOA\soa-microservices\DeviceMicroservice\deviceServices:/app/deviceServices
+    depends_on:
+        - hivemq
+  data:
+    image: data
+    build:
+        context: ./DataMicroservice
+        dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    depends_on:
+        - influxdbData
+        - analytics
+  analytics:
+    image: analytics
+    build:
+        context: ./AnalyticsMicroservice
+        dockerfile: Dockerfile
+    ports:
+      - "6000:80"
+    depends_on:
+        - hivemq
+  gateway: 
+    image: gateway
+    build:
+        context: ./GatewayMicroservice
+        dockerfile: Dockerfile
+    ports:
+      - "5008:80"
+    depends_on:
+        - data
+        - device
+  commandService:
+    image: commandservice
+    build:
+        context: ./CommandMicroservice
+        dockerfile: Dockerfile
+    depends_on:
+        - device
+volumes:
+  influxdbvData:
+  influxdbvAnalytics:
+  deviceServices:

@@ -52,7 +52,7 @@ namespace DeviceMicroservice.Services
 
         private async void OnTimerEvent(object sender, ElapsedEventArgs args)
         {
-            if (!_mqttService.IsConnected())
+            if(!_mqttService.IsConnected())
             {
                 await _mqttService.Connect();
             }
@@ -62,7 +62,10 @@ namespace DeviceMicroservice.Services
                 this.ReadValue();
                 SensorData data = new SensorData(this.Value, this.SensorType);
                 if (!this.IsThreshold)
+                {
                     await _mqttService.Publish(data, "sensor/data");
+                    Console.WriteLine($"{data.SensorType}: {data.Value}");
+                }
                 else if (data.Value > this.Threshold)
                     await _mqttService.Publish(data, "sensor/data");
             }

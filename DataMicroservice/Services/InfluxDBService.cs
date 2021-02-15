@@ -8,21 +8,23 @@ namespace DataMicroservice.Services
 {
     public class InfluxDBService : IInfluxDBService
     {
-        public const string DB_CONNECTION_URL = "http://localhost:8086";
-        public const string DB_TOKEN = "ehq5KHgbIiTkeENZm-CAHzXcheTh34kU02Qzb7PIRTCQsDjglwpDxED-XSsir9gc-JfIDOd_KHUEQV6h0KAKSg==";
+        public const string DB_CONNECTION_URL = "http://influxdbData:8086";
         public const string DB_BUCKET = "soa";
         public const string DB_ORGANIZATION = "soa";
+        public const string DB_USER = "admin";
+        public readonly char[] DB_PASSWORD = "adminadmin".ToCharArray();
 
         private InfluxDBClient _client;
 
         public InfluxDBService()
         {
             CreateDatabase();
+
         }
 
         private void CreateDatabase()
         {
-            _client = InfluxDBClientFactory.Create(DB_CONNECTION_URL, DB_TOKEN.ToCharArray());
+            _client = InfluxDBClientFactory.Create(DB_CONNECTION_URL, DB_USER, DB_PASSWORD);
         }
 
         public void Write(string data)

@@ -119,7 +119,7 @@ namespace DeviceMicroservice.Controllers
                             sensor.StartSensor();
                             return Ok($"Sensor {type} turned on");
                         }
-                        return Ok($"Sensor {type} alredy stopped");
+                        return Ok($"Sensor {type} alredy started");
                     }
                     else
                     {

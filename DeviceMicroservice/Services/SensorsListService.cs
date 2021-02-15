@@ -10,9 +10,9 @@ namespace DeviceMicroservice.Services
         {
             this.SensorsList = new List<SensorService>
             {
-                new SensorService(mqttService, "Temperature", "weatherHistory.csv"),
-                new SensorService(mqttService, "Humidity", "weatherHistory.csv"),
-                new SensorService(mqttService, "Pressure", "weatherHistory.csv")
+                new SensorService(mqttService, "Temperature", "/app/deviceServices/weatherHistory.csv"),
+                new SensorService(mqttService, "Humidity", "/app/deviceServices/weatherHistory.csv"),
+                new SensorService(mqttService, "Pressure", "/app/deviceServices/weatherHistory.csv")
             };
         }
 
