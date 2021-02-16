@@ -1,8 +1,6 @@
-﻿using DataMicroservice.DataModels;
-using DataMicroservice.Services;
+﻿using DataMicroservice.Services;
 using InfluxDB.Client.Core.Flux.Domain;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -11,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataMicroservice.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class DataController : ControllerBase
     {
@@ -24,62 +22,184 @@ namespace DataMicroservice.Controllers
             this._dataService = dataService;
         }
 
-        // GET: api/<DataController>
-        //[HttpGet]
-        //public async Task<IActionResult> Get()
-        //{
-        //}
 
-        // GET api/<DataController>/5
         [HttpGet("{sensorType}")]
-        [Route("getsensordata")]
-        async public Task<IActionResult> GetSensorData([FromQuery] string sensorType)
+        async public Task<IActionResult> GetSensorCurrentValue([Required, FromRoute] string sensorType)
         {
-            Console.WriteLine($"sensorType: {sensorType}");
+
             string query = $"from(bucket: \"soa\") " +
-                $"|> range(start: -50m) " +
+                $"|> range(start: -2m) " +
                 $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
                 $"|> filter(fn: (r) => r._field == \"value\") " +
-                $"|> filter(fn: (r) => r.sensor == \"{sensorType}\")";
-            Console.WriteLine(query);
-            List<FluxTable> query_data = await _influxDBService.Query(query);
-            Console.WriteLine("query data:");
-            foreach (var data_point in query_data)
-            {
-                Console.WriteLine(data_point);
-            }
-            return Ok(query_data);
+                $"|> filter(fn: (r) => r.sensor == \"{sensorType.ToLower()}\")" +
+                $"|> last()";
+            List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            var fluxRecord = fluxTables[0].Records[0];
+            return Ok(fluxRecord);
         }
 
-        [HttpGet("{minutes}")]
-        [Route("getlastnminutesdata")]
-        async public Task<IActionResult> GetLastNMinutesData([FromQuery] int minutes)
+        [HttpGet]
+        async public Task<IActionResult> GetAllSensorsCurrentValues()
+        {
+
+            string query = $"from(bucket: \"soa\") " +
+                $"|> range(start: -2m) " +
+                $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
+                $"|> filter(fn: (r) => r._field == \"value\") " +
+                $"|> last()";
+            List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            List<FluxRecord> fluxRecords = new List<FluxRecord>();
+            fluxTables.ForEach(fluxTable =>
+            {
+                fluxTable.Records.ForEach(fluxRecord =>
+                {
+                    fluxRecords.Add(fluxRecord);
+                    //foreach (KeyValuePair<string, object> kvp in fluxRecord.Values)
+                    //{
+                    //    Console.WriteLine($"key: {kvp.Key}, val: {kvp.Value}");
+                    //}
+                });
+            });
+            return Ok(fluxRecords);
+        }
+
+        [HttpGet("{sensorType}")]
+        async public Task<IActionResult> GetMaxValue([Required, FromRoute] string sensorType)
+        {
+            string query = $"from(bucket: \"soa\") " +
+                $"|> range(start: 2021-01-01T00:00:00.0Z, stop: now()) " +
+                $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
+                $"|> filter(fn: (r) => r._field == \"value\") " +
+                $"|> filter(fn: (r) => r.sensor == \"{sensorType.ToLower()}\")" +
+                $"|> max()";
+            List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            var fluxRecord = fluxTables[0].Records[0];
+            return Ok(fluxRecord);
+        }
+
+        [HttpGet]
+        async public Task<IActionResult> GetAllSensorsMaxValues()
+        {
+            string query = $"from(bucket: \"soa\") " +
+                $"|> range(start: 2021-01-01T00:00:00.0Z, stop: now()) " +
+                $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
+                $"|> filter(fn: (r) => r._field == \"value\") " +
+                $"|> max()";
+            List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            List<FluxRecord> fluxRecords = new List<FluxRecord>();
+            fluxTables.ForEach(fluxTable =>
+            {
+                fluxTable.Records.ForEach(fluxRecord =>
+                {
+                    fluxRecords.Add(fluxRecord);
+                });
+            });
+            return Ok(fluxRecords);
+        }
+
+        [HttpGet("{sensorType}")]
+        async public Task<IActionResult> GetMinValue([Required, FromRoute] string sensorType)
+        {
+            string query = $"from(bucket: \"soa\") " +
+                $"|> range(start: 2021-01-01T00:00:00.0Z, stop: now()) " +
+                $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
+                $"|> filter(fn: (r) => r._field == \"value\") " +
+                $"|> filter(fn: (r) => r.sensor == \"{sensorType.ToLower()}\")" +
+                $"|> min()";
+            List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            var fluxRecord = fluxTables[0].Records[0];
+            return Ok(fluxRecord);
+        }
+
+        [HttpGet]
+        async public Task<IActionResult> GetAllSensorsMinValues()
+        {
+            string query = $"from(bucket: \"soa\") " +
+                $"|> range(start: 2021-01-01T00:00:00.0Z, stop: now()) " +
+                $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
+                $"|> filter(fn: (r) => r._field == \"value\") " +
+                $"|> min()";
+            List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            List<FluxRecord> fluxRecords = new List<FluxRecord>();
+            fluxTables.ForEach(fluxTable =>
+            {
+                fluxTable.Records.ForEach(fluxRecord =>
+                {
+                    fluxRecords.Add(fluxRecord);
+                });
+            });
+            return Ok(fluxRecords);
+        }
+
+        [HttpGet("{sensorType}")]
+        async public Task<IActionResult> GetLastNHoursMeanValue([Required, FromRoute] string sensorType, [Required, FromQuery(Name = "hours")] int hours)
+        {
+            string query = $"from(bucket: \"soa\") " +
+                $"|> range(start: -{hours}h) " +
+                $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
+                $"|> filter(fn: (r) => r._field == \"value\") " +
+                $"|> filter(fn: (r) => r.sensor == \"{sensorType.ToLower()}\")" +
+                $"|> mean()";
+            List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            var fluxRecord = fluxTables[0].Records[0];
+            return Ok(fluxRecord);
+        }
+
+        [HttpGet]
+        async public Task<IActionResult> GetAllSensorsLastNHoursMeanValues([Required, FromQuery(Name = "hours")] int hours)
+        {
+            string query = $"from(bucket: \"soa\") " +
+                $"|> range(start: -{hours}h) " +
+                $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
+                $"|> filter(fn: (r) => r._field == \"value\") " +
+                $"|> mean()";
+            List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            List<FluxRecord> fluxRecords = new List<FluxRecord>();
+            fluxTables.ForEach(fluxTable =>
+            {
+                fluxTable.Records.ForEach(fluxRecord =>
+                {
+                    fluxRecords.Add(fluxRecord);
+                });
+            });
+            return Ok(fluxRecords);
+        }
+
+        [HttpGet("{sensorType}")]
+        async public Task<IActionResult> GetLastNMinutesValues([Required, FromRoute] string sensorType, [Required, FromQuery(Name = "minutes")] int minutes)
         {
             string query = $"from(bucket: \"soa\") " +
                 $"|> range(start: -{minutes}m) " +
                 $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
-                $"|> filter(fn: (r) => r._field == \"value\") ";
-            List<FluxTable> query_data = await _influxDBService.Query(query);
-            return Ok(query_data);
+                $"|> filter(fn: (r) => r.sensor == \"{sensorType.ToLower()}\")" +
+                $"|> filter(fn: (r) => r._field == \"value\")";
+            List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            List<FluxRecord> fluxRecords = new List<FluxRecord>();
+            fluxTables.ForEach(fluxTable =>
+            {
+                fluxTable.Records.ForEach(fluxRecord =>
+                {
+                    fluxRecords.Add(fluxRecord);
+                });
+            });
+            return Ok(fluxRecords);
         }
 
-        // POST api/<DataController>
-        [HttpPost]
-        public void Post([FromBody, Required] SensorData data)
+        [HttpGet]
+        async public Task<IActionResult> GetAllSensorsLastNMinutesValues([Required, FromQuery(Name = "minutes")] int minutes)
         {
-            this._dataService.saveData(data);
+            string query = $"from(bucket: \"soa\") " +
+                $"|> range(start: -{minutes}m) " +
+                $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
+                $"|> filter(fn: (r) => r._field == \"value\")";
+            List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            List<List<FluxRecord>> fluxRecords = new List<List<FluxRecord>>();
+            fluxTables.ForEach(fluxTable =>
+            {
+                fluxRecords.Add(fluxTable.Records);
+            });
+            return Ok(fluxRecords);
         }
 
-        // PUT api/<DataController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<DataController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }

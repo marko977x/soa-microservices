@@ -15,6 +15,19 @@ namespace DeviceMicroservice.Controllers
             _sensorsListService = sensorService;
         }
 
+        [HttpGet]
+        public IActionResult GetCommandList()
+        {
+            string commandsList = $"GetSensorParams: type\n" +
+                $"GetAllSensorsParams: no params\n" +
+                $"GetTimeout: type\n" +
+                $"GetThreshold: type\n" +
+                $"TurnOnOffSensor: (is)on; type\n" +
+                $"SetTimeout: type; (timeout) value\n" +
+                $"SetThreshold: type; (threshold) value\n";
+            return Ok(commandsList);
+        }
+
         [HttpGet("{type}")]
         public IActionResult GetSensorParams([Required, FromRoute] string type)
         {
@@ -62,7 +75,7 @@ namespace DeviceMicroservice.Controllers
 
                     string timeoutInfo = JsonSerializer.Serialize(new
                     {
-                        isTimeout = !sensor.IsTreshold,
+                        isTimeout = !sensor.IsThreshold,
                         value = sensor.Timeout
                     }, options);
 
@@ -84,7 +97,7 @@ namespace DeviceMicroservice.Controllers
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                         WriteIndented = true
                     };
-                    string tresholdInfo = JsonSerializer.Serialize(new { isTreshold = sensor.IsTreshold, value = sensor.Threshold }, options);
+                    string tresholdInfo = JsonSerializer.Serialize(new { isTreshold = sensor.IsThreshold, value = sensor.Threshold }, options);
                     return Ok(tresholdInfo);
                 }
             }
@@ -124,15 +137,14 @@ namespace DeviceMicroservice.Controllers
 
         [HttpPost("{type}")]
         public IActionResult SetTimeout(
-            [Required, FromRoute] string type, double? value)
+            [Required, FromRoute] string type, [Required, FromBody] double? value)
 
         {
-            System.Console.WriteLine(value);
             foreach (var sensor in this._sensorsListService.SensorsList)
             {
                 if (type.ToLower() == sensor.SensorType.ToLower())
                 {
-                    sensor.IsTreshold = false;
+                    sensor.IsThreshold = false;
                     if (value != null)
                     {
                         sensor.SetTimeout((double)value);
@@ -147,10 +159,9 @@ namespace DeviceMicroservice.Controllers
             return BadRequest("Type of sensor doesn't exist");
         }
 
-
         [HttpPost("{type}")]
         public IActionResult SetThreshold(
-            [Required, FromRoute] string type, [FromBody] double? value)
+            [Required, FromRoute] string type, [Required, FromBody] double? value)
         {
             if (value == null) return BadRequest("Provide treshold value");
 
@@ -158,15 +169,15 @@ namespace DeviceMicroservice.Controllers
             {
                 if (type.ToLower() == sensor.SensorType.ToLower())
                 {
-                    sensor.IsTreshold = true;
+                    sensor.IsThreshold = true;
                     if (value != null)
                     {
                         sensor.Threshold = (float)value;
-                        return Ok($"Treshold based measuring started for {type} sensor. New Treshold value set");
+                        return Ok($"Threshold based measuring started for {type} sensor. New Threshold value set");
                     }
                     else
                     {
-                        return Ok($"Treshold based measuring started for {type} sensor. Default Treshold value used");
+                        return Ok($"Threshold based measuring started for {type} sensor. Default Threshold value used");
                     }
                 }
             }

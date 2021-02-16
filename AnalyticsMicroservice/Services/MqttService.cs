@@ -24,7 +24,7 @@ namespace AnalyticsMicroservice.Services
             {
                 await _client.ConnectAsync(
                     new MqttClientOptionsBuilder()
-                        .WithWebSocketServer(PUBLIC_MQTT_SERVER_SOCKET)
+                        .WithTcpServer("127.0.0.1", 1883)
                         .Build(),
                     CancellationToken.None);
             }
