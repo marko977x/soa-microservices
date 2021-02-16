@@ -24,9 +24,23 @@ namespace DeviceMicroservice.Services
             {
                 await _client.ConnectAsync(
                     new MqttClientOptionsBuilder()
-                        .WithTcpServer("127.0.0.1", 1883)
+                        .WithTcpServer("hivemq", 1883)
+                        .WithCleanSession(true)
                         .Build(),
                     CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("MQTT Connect failed: " + e.Message);
+            }
+        }
+
+        public async Task Discoonnect()
+        {
+            try
+            {
+                await _client.DisconnectAsync();
+                Console.WriteLine("Disconnected");
             }
             catch (Exception e)
             {

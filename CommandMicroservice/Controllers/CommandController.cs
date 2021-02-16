@@ -1,13 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CommandMicroservice.Controllers
 {
@@ -17,7 +12,7 @@ namespace CommandMicroservice.Controllers
     {
 
         [HttpPost]
-        public void PostCommand([Required, FromBody]string command)
+        public void PostCommand([Required, FromBody] string command)
         {
             Console.WriteLine(command);
             if (command.ToLower().Contains("temperature"))
@@ -44,7 +39,7 @@ namespace CommandMicroservice.Controllers
             HttpClient httpClient = new HttpClient();
             try
             {
-                var responseMessage = await httpClient.PostAsync("http://localhost:5000/api/Device/TurnOnOffSensor/" + 
+                var responseMessage = await httpClient.PostAsync("http://device/api/Device/TurnOnOffSensor/" +
                     sensorType, new StringContent("false", Encoding.UTF8, "application/json"));
                 Console.WriteLine($"post response: {responseMessage}");
             }

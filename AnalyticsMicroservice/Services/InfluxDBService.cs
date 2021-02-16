@@ -3,15 +3,17 @@ using InfluxDB.Client.Core.Flux.Domain;
 using InfluxDB.Client.Writes;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
 
 namespace AnalyticsMicroservice.Services
 {
     public class InfluxDBService : IInfluxDBService
     {
-        public const string DB_CONNECTION_URL = "http://localhost:8086";
-        public const string DB_TOKEN = "ehq5KHgbIiTkeENZm-CAHzXcheTh34kU02Qzb7PIRTCQsDjglwpDxED-XSsir9gc-JfIDOd_KHUEQV6h0KAKSg==";
+        public const string DB_CONNECTION_URL = "http://influxdbAnalytics:8087";
         public const string DB_BUCKET = "soa";
         public const string DB_ORGANIZATION = "soa";
+        public const string DB_USER = "admin";
+        public readonly char[] DB_PASSWORD = "adminadmin".ToCharArray();
 
         private InfluxDBClient _client;
 
@@ -22,7 +24,7 @@ namespace AnalyticsMicroservice.Services
 
         private void CreateDatabase()
         {
-            _client = InfluxDBClientFactory.Create(DB_CONNECTION_URL, DB_TOKEN.ToCharArray());
+            _client = InfluxDBClientFactory.Create(DB_CONNECTION_URL, DB_USER, DB_PASSWORD);
         }
 
         public void Write(string data)
@@ -30,6 +32,7 @@ namespace AnalyticsMicroservice.Services
             using (WriteApi writeApi = _client.GetWriteApi())
             {
                 writeApi.WriteRecord(DB_BUCKET, DB_ORGANIZATION, InfluxDB.Client.Api.Domain.WritePrecision.Ms, data);
+                Console.WriteLine("Data saved to influxdb");
             }
         }
 
@@ -38,6 +41,7 @@ namespace AnalyticsMicroservice.Services
             using (WriteApi writeApi = _client.GetWriteApi())
             {
                 writeApi.WriteMeasurement<T>(DB_BUCKET, DB_ORGANIZATION, InfluxDB.Client.Api.Domain.WritePrecision.Ms, data);
+                Console.WriteLine("Data saved to influxdb");
             }
         }
 
@@ -46,6 +50,7 @@ namespace AnalyticsMicroservice.Services
             using (WriteApi writeApi = _client.GetWriteApi())
             {
                 writeApi.WritePoint(DB_BUCKET, DB_ORGANIZATION, point);
+                Console.WriteLine("Point saved to influxdb");
             }
         }
 

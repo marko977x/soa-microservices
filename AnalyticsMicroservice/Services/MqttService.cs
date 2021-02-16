@@ -22,11 +22,25 @@ namespace AnalyticsMicroservice.Services
         {
             try
             {
-                await _client.ConnectAsync(
+                    await _client.ConnectAsync(
                     new MqttClientOptionsBuilder()
-                        .WithTcpServer("127.0.0.1", 1883)
+                        .WithTcpServer("hivemq", 1883)
+                        .WithCleanSession(true)
                         .Build(),
                     CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Connect failed: " + e.Message);
+            }
+        }
+
+        public async Task Discoonnect()
+        {
+            try
+            {
+                await _client.DisconnectAsync();
+                Console.WriteLine("Disconnected");
             }
             catch (Exception e)
             {
@@ -86,5 +100,7 @@ namespace AnalyticsMicroservice.Services
                 Console.WriteLine("Subscribe failed: " + e.Message);
             }
         }
+
+
     }
 }
