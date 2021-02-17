@@ -53,12 +53,12 @@ namespace GatewayMicroservice.Controllers
 
         [HttpPost("{type}")]
         public async Task<IActionResult> SetTimeout(
-            [Required, FromRoute] string type, [FromBody] double? value)
+            [Required, FromRoute] string type, [FromQuery(Name = "value")] double? value)
             => await ProxyPost("http://device/api/Device/SetTimeout/" + type, JsonSerializer.Serialize(value, typeof(double)));
 
         [HttpPost("{type}")]
         public async Task<IActionResult> SetThreshold(
-            [Required, FromRoute] string type, [Required, FromBody] double? value)
+            [Required, FromRoute] string type, [Required, FromQuery(Name = "value")] double? value)
             => await ProxyPost("http://device/api/Device/SetThreshold/" + type, JsonSerializer.Serialize(value, typeof(double)));
 
         //DATA ENDPOINTS

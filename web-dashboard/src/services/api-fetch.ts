@@ -7,7 +7,7 @@ export function apiFetch(method: string, url: string, data: any = null): Promise
     method: method,
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json, text/plain, */*'
+      'Accept': 'application/json, text/plain, */*',
     },
     body: data ? JSON.stringify(data) : undefined
   }

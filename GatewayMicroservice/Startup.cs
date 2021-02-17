@@ -26,6 +26,19 @@ namespace GatewayMicroservice
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("MyCorsPolicy",
+                builder => builder
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
+                    .WithOrigins("http://localhost:3000")
+                    .AllowAnyMethod()
+                    .AllowCredentials()
+                    .AllowAnyHeader()
+                    .Build()
+                );
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,6 +54,8 @@ namespace GatewayMicroservice
             app.UseRouting();
 
             app.UseAuthorization();
+            
+            app.UseCors("MyCorsPolicy");
 
             app.UseEndpoints(endpoints =>
             {

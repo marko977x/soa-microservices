@@ -14,3 +14,7 @@
   background-color: rgb(200, 200, 200);
   width: 100%;
 }
+
+.content > div {
+  flex-basis: 100%;
+}

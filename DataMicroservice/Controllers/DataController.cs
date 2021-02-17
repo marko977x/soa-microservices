@@ -172,17 +172,11 @@ namespace DataMicroservice.Controllers
                 $"|> range(start: -{minutes}m) " +
                 $"|> filter(fn: (r) => r._measurement == \"SensorsData\") " +
                 $"|> filter(fn: (r) => r.sensor == \"{sensorType.ToLower()}\")" +
-                $"|> filter(fn: (r) => r._field == \"value\")";
+                $"|> filter(fn: (r) => r._field == \"value\")" +
+                $"|> mean()";
             List<FluxTable> fluxTables = await _influxDBService.Query(query);
-            List<FluxRecord> fluxRecords = new List<FluxRecord>();
-            fluxTables.ForEach(fluxTable =>
-            {
-                fluxTable.Records.ForEach(fluxRecord =>
-                {
-                    fluxRecords.Add(fluxRecord);
-                });
-            });
-            return Ok(fluxRecords);
+            var fluxRecord = fluxTables[0].Records[0];
+            return Ok(fluxRecord);
         }
 
         [HttpGet]

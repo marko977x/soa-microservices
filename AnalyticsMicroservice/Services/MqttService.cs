@@ -31,7 +31,7 @@ namespace AnalyticsMicroservice.Services
             }
             catch (Exception e)
             {
-                Console.WriteLine("Connect failed: " + e.Message);
+                // Console.WriteLine("Connect failed: " + e.Message);
             }
         }
 
@@ -44,7 +44,7 @@ namespace AnalyticsMicroservice.Services
             }
             catch (Exception e)
             {
-                Console.WriteLine("Connect failed: " + e.Message);
+                // Console.WriteLine("Connect failed: " + e.Message);
             }
         }
 

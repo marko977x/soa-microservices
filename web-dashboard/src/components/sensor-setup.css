@@ -1,0 +1,15 @@
+.sensor-setup {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0px 10% 0px 10%;
+}
+
+.sensor-setup > div {
+    margin-bottom: 15px;
+}
+
+.radio-buttons {
+    display: flex;
+    justify-content: space-around;
+}
