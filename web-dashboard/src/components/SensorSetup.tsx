@@ -1,5 +1,5 @@
 import { Button, FormControl, FormControlLabel, NativeSelect, Radio, RadioGroup, TextField, Typography } from "@material-ui/core";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { IWeatherData } from "../App";
 import "./sensor-setup.css";
 
@@ -17,12 +17,28 @@ function SensorSetup(props: ISensorSetupProps) {
   const [sensor, setSensor] = useState(props.weatherData.sensors.find(sensor => sensor.name == selectedSensor));
   const [selectedValue, setselectedValue] = useState(sensor?.isThreshold ? sensor.threshold : sensor?.timeout);
   const [option, setOption] = useState(sensor && sensor?.isThreshold ? THRESHOLD : TIMEOUT);
+  const [initialUpdate, setInitialUpdate] = useState(2);
+
+  useEffect(() => {
+    if (initialUpdate > 0) {
+      let mysensor = props.weatherData.sensors.find(item => item.name == selectedSensor);
+      console.log(mysensor);
+      if (option == THRESHOLD && mysensor && mysensor.threshold != selectedValue) {
+        setselectedValue(mysensor.threshold);
+      }
+      else if (option == TIMEOUT && mysensor && mysensor.timeout != selectedValue) {
+        setselectedValue(mysensor.timeout);
+      }
+      setInitialUpdate(initialUpdate - 1);
+    }
+  }, [props.weatherData])
   
   const handleSensorChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedSensor(event.target.value);
-    setSensor(props.weatherData.sensors.find(sensor => sensor.name == event.target.value));
-    setOption(sensor && sensor?.isThreshold ? THRESHOLD : TIMEOUT);
-    setselectedValue(sensor?.isThreshold ? sensor.threshold : sensor?.timeout);
+    let newSensor = props.weatherData.sensors.find(item => item.name == event.target.value);
+    setSensor(newSensor);
+    setOption(newSensor && newSensor?.isThreshold ? THRESHOLD : TIMEOUT);
+    setselectedValue(newSensor?.isThreshold ? newSensor.threshold : newSensor?.timeout);
   }
 
   const handleModeChange = (event: ChangeEvent<HTMLInputElement>) => {

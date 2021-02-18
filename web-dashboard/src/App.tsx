@@ -111,10 +111,12 @@ function App() {
   }
 
   const updateMinValue = (index: number) => {
+    console.log(weatherData.sensors[index].name);
     apiFetch('GET', `${GATEWAY}/api/Gateway/GetMinValue/${weatherData.sensors[index].name}`
       ).then(response => {
         return response.json();
       }).then(result => {
+        console.log(result);
         if (result == null) return;
         let data = {...weatherData};
         data.sensors[index].minValue = result.values._value;

@@ -1,4 +1,18 @@
 .notification {
+  margin: 0px 10px 0px 10px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
   width: 100%;
-  /* height: 100%; */
+}
+
+.paper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text {
+  text-align: center;
 }
