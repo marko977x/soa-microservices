@@ -16,6 +16,7 @@ Analytics mikroservis prima podatke sa Data mikroservisa, analizira ih u cilju d
 i smesta u bazu(influxdb). 
 
 ### Command microservice
+Command mikroservis dobija podatke od Analytics mikroservisa preko POST metode i u zavisnoti od događaja ima mogućnost da ugasi senzor ako je Analytics mikroservis ustanovio da je senzor poslao nekorektne parametre očitavanja, i stoga prestao sa korektnim radom.
 
 ### Gateway microservice
 Gateway mikroservis predstavlja REST API za veb klijenta.
@@ -25,7 +26,7 @@ Web dashboard predstavlja graficki interfejs ove aplikacije, nudi prikaz podatak
 
 ## Message Brokeri
 
-Za komunikaciju izmedju mikroservisa koriste se brokeri, za slanje poruke veb klijentu od strane analytics mikroservisa koristi se SignalR biblioteka za socket komunikaciju. 
+Za komunikaciju izmedju mikroservisa koriste se brokeri, za slanje poruke veb klijentu od strane analytics mikroservisa koristi se SignalR biblioteka za web socket komunikaciju. 
 U aplikaciji postoje dva topic-a, jedan za komunikaciju izmedju Device i Data mikroservisa i drugi za komunikaciju izmedju Data mikroservisa i Analytics mikroservisa. 
 
 ## Endpoints
