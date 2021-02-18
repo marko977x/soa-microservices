@@ -37,7 +37,7 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      - E:\Skola\IVGodina\PoslednjiSemestar\SOA\soa-microservices\DeviceMicroservice\deviceServices:/app/deviceServices
+      - /home/marko977x/marko977x/Faculty/SOA/Workspace/soa-microservices/DeviceMicroservice/deviceServices:/app/deviceServices
     depends_on:
         - hivemq
   data:
@@ -56,7 +56,7 @@ services:
         context: ./AnalyticsMicroservice
         dockerfile: Dockerfile
     ports:
-      - "6000:80"
+      - "5006:80"
     depends_on:
         - hivemq
   gateway: 
