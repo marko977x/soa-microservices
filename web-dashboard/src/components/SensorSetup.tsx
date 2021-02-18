@@ -9,8 +9,8 @@ interface ISensorSetupProps {
   onThresholdSave: (sensor: string, threshold: number) => void,
 }
 
-const THRESHOLD: string = "threshold";
-const TIMEOUT: string = "timeout";
+const THRESHOLD: string = "Threshold";
+const TIMEOUT: string = "Timeout";
 
 function SensorSetup(props: ISensorSetupProps) {
   const [selectedSensor, setSelectedSensor] = useState("Temperature");
@@ -26,7 +26,6 @@ function SensorSetup(props: ISensorSetupProps) {
   }
 
   const handleModeChange = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
     event.target.value == THRESHOLD ? setselectedValue(sensor?.threshold) : setselectedValue(sensor?.timeout);
     setOption(event.target.value);
   }

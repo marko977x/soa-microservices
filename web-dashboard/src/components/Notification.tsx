@@ -1,5 +1,7 @@
-import { Card, CardContent, CardMedia, Typography } from "@material-ui/core";
-import React from "react";
+import { Card, CardContent, Typography } from "@material-ui/core";
+import React, { useEffect, useState } from "react";
+import { apiFetch } from "../services/api-fetch";
+import { connection } from "../services/hub-connections";
 import "./notification.css";
 
 interface INotification {
@@ -18,26 +20,21 @@ const images: NotificationImagePair = {
 }
 
 function Notification() {
-  let notification: INotification = {
-    name: "Suncano",
-    text: "Danas ce biti suncano vreme.",
-    background: "sunny.png"
-  };
+  const [notification, setNotification] = useState("Nema dogadjaja od vaznosti!");
 
-  // connection.on("SendNotification", data => {
-  //   console.log("Client received notification: " + data);
-  // });
+  connection.on("SendEvent", data => {
+    setNotification(data as string);
+  });
+
+  useEffect(() => {
+    apiFetch('POST', `http://localhost:5006/api/Analytics/Subscribe/?connectionId=${connection.connectionId}`);
+  }, [])
 
   return (
     <div className="notification">
       <Card>
-        <CardMedia
-          component="img"
-          image={notification.background}
-          title={notification.name}
-        ></CardMedia>
         <CardContent>
-          <Typography variant="body2" color="textSecondary" component="p">{notification.text}</Typography>
+          <Typography variant="body2" color="textSecondary" component="p">{notification}</Typography>
         </CardContent>
       </Card>
     </div >

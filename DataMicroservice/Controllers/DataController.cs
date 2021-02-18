@@ -34,6 +34,7 @@ namespace DataMicroservice.Controllers
                 $"|> filter(fn: (r) => r.sensor == \"{sensorType.ToLower()}\")" +
                 $"|> last()";
             List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            if (fluxTables == null || fluxTables.Count==0) return Ok(new List<FluxTable>());
             var fluxRecord = fluxTables[0].Records[0];
             return Ok(fluxRecord);
         }
@@ -73,6 +74,7 @@ namespace DataMicroservice.Controllers
                 $"|> filter(fn: (r) => r.sensor == \"{sensorType.ToLower()}\")" +
                 $"|> max()";
             List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            if (fluxTables == null || fluxTables.Count==0) return Ok(new List<FluxTable>());
             var fluxRecord = fluxTables[0].Records[0];
             return Ok(fluxRecord);
         }
@@ -107,6 +109,7 @@ namespace DataMicroservice.Controllers
                 $"|> filter(fn: (r) => r.sensor == \"{sensorType.ToLower()}\")" +
                 $"|> min()";
             List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            if (fluxTables == null || fluxTables.Count==0) return Ok(new List<FluxTable>());
             var fluxRecord = fluxTables[0].Records[0];
             return Ok(fluxRecord);
         }
@@ -141,6 +144,7 @@ namespace DataMicroservice.Controllers
                 $"|> filter(fn: (r) => r.sensor == \"{sensorType.ToLower()}\")" +
                 $"|> mean()";
             List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            if (fluxTables == null || fluxTables.Count==0) return Ok(new List<FluxTable>());
             var fluxRecord = fluxTables[0].Records[0];
             return Ok(fluxRecord);
         }
@@ -175,6 +179,7 @@ namespace DataMicroservice.Controllers
                 $"|> filter(fn: (r) => r._field == \"value\")" +
                 $"|> mean()";
             List<FluxTable> fluxTables = await _influxDBService.Query(query);
+            if (fluxTables == null || fluxTables.Count==0) return Ok(new List<FluxTable>());
             var fluxRecord = fluxTables[0].Records[0];
             return Ok(fluxRecord);
         }

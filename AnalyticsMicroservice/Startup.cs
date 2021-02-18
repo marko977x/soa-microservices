@@ -1,4 +1,5 @@
-﻿using AnalyticsMicroservice.Services;
+﻿using AnalyticsMicroservice.Models;
+using AnalyticsMicroservice.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +23,20 @@ namespace AnalyticsMicroservice
             services.AddHttpClient();
             services.AddControllers();
             services.AddServices();
+            services.AddSignalR();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("MyCorsPolicy",
+                builder => builder
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
+                    .WithOrigins("http://localhost:3000")
+                    .AllowAnyMethod()
+                    .AllowCredentials()
+                    .AllowAnyHeader()
+                    .Build()
+                );
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,10 +50,12 @@ namespace AnalyticsMicroservice
             }
 
             app.UseRouting();
+            app.UseCors("MyCorsPolicy");
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<MessageHub>("/event");
             });
         }
     }

@@ -111,11 +111,11 @@ function App() {
   }
 
   const updateMinValue = (index: number) => {
-    console.log("Update");
     apiFetch('GET', `${GATEWAY}/api/Gateway/GetMinValue/${weatherData.sensors[index].name}`
       ).then(response => {
         return response.json();
       }).then(result => {
+        if (result == null) return;
         let data = {...weatherData};
         data.sensors[index].minValue = result.values._value;
         setWeatherData(data);
@@ -127,6 +127,7 @@ function App() {
       ).then(response => {
         return response.json();
       }).then(result => {
+        if (result == null) return;
         let data = {...weatherData};
         data.sensors[index].maxValue = result.values._value;
         setWeatherData(data);
@@ -138,6 +139,7 @@ function App() {
       ).then(response => {
         return response.json();
       }).then(result => {
+        if (result == null) return;
         let data = {...weatherData};
         data.sensors[index].latestValue = result.values._value;
         setWeatherData(data);
@@ -149,6 +151,7 @@ function App() {
       ).then(response => {
         return response.json();
       }).then(result => {
+        if (result == null) return;
         let data = {...weatherData};
         data.sensors[index].lastMinuteAvgValue = result.values._value;
         setWeatherData(data);
@@ -160,6 +163,7 @@ function App() {
       ).then(response => {
         return response.json();
       }).then(result => {
+        if (result == null) return;
         let data = {...weatherData};
         data.sensors[index].lastHourAvgValue = result.values._value;
         setWeatherData(data);
@@ -170,6 +174,7 @@ function App() {
     apiFetch('GET', `${GATEWAY}/api/Gateway/GetAllSensorsParams`)
       .then(response => response.json())
       .then(result => {
+        if (result == null) return;
         let data = {...weatherData};
         result.forEach((item: any, index: number) => {
           data.sensors[index].isThreshold = item.isThreshold;

@@ -1,6 +1,7 @@
 ﻿using AnalyticsMicroservice.Models;
 using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Writes;
+using Microsoft.AspNetCore.SignalR;
 using MQTTnet;
 using Newtonsoft.Json;
 using System;
@@ -19,10 +20,12 @@ namespace AnalyticsMicroservice.Services
         private IInfluxDBService _database;
         private event EventHandler ServiceCreated;
         private WeatherData _model;
-        public AnalyticsService(MqttService mqttService, IInfluxDBService database)
+        private IHubContext<MessageHub> _hubContext;
+        public AnalyticsService(MqttService mqttService, IInfluxDBService database, IHubContext<MessageHub> hubContext)
         {
             _mqttService = mqttService;
             _database = database;
+            _hubContext = hubContext;
             _model = new WeatherData();
             ServiceCreated += OnServiceCreated;
             ServiceCreated?.Invoke(this, EventArgs.Empty);
@@ -48,7 +51,7 @@ namespace AnalyticsMicroservice.Services
             }
         }
 
-        private void OnDataReceived(MqttApplicationMessageReceivedEventArgs arg)
+        private async void OnDataReceived(MqttApplicationMessageReceivedEventArgs arg)
         {
             try
             {
@@ -58,7 +61,6 @@ namespace AnalyticsMicroservice.Services
                 Console.WriteLine($"type: {data.SensorType}, val: {data.Value}");
 
                 _model[data.SensorType] = data.Value;
-
                 if (!_model.Check()) return;
                 string eventVal = GetEventBasedOnModel();
                 Console.WriteLine($"val: {eventVal}");
@@ -103,7 +105,7 @@ namespace AnalyticsMicroservice.Services
 
         private async void SendEventToWebDashboard(string eventVal)
         {
-
+            await _hubContext.Clients.All.SendAsync("SendEvent", eventVal);
         }
     }
 }
